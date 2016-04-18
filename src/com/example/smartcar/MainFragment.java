@@ -1,5 +1,6 @@
 package com.example.smartcar;
 
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

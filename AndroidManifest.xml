@@ -22,12 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity 
+        <activity
             android:name=".SwipActivity"
             android:label="SWIP ACTIVITY" >
-            
-            ></activity>
+            >
+        </activity>
+        <activity
+            android:name=".BtConnection"
+            android:label="@string/title_activity_bt_connection" >
+        </activity>
         
     </application>
-
+	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 </manifest>

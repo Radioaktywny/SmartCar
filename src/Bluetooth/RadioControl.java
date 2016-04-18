@@ -9,15 +9,24 @@ public class RadioControl extends BluetoothControl{
 	}
 	public void volumeControl()
 	{
-		
+		if(isConnected())
+		{
+			out.println("VOLUMEUP");
+		}
 	}
 	public void playMusic()
 	{
-		
+		if(isConnected())
+		{
+			out.println("PLAYMUSIC");
+		}
 	}
 	public void callingMode()
 	{
-		
+		if(isConnected())
+		{
+			out.println("CALLING");
+		}
 	}
 	public boolean isStatus() {
 		return status;

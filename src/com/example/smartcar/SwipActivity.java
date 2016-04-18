@@ -1,13 +1,23 @@
 package com.example.smartcar;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import Bluetooth.BluetoothControl;
+import Bluetooth.LockControl;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class SwipActivity extends FragmentActivity implements
 ActionBar.TabListener{
@@ -23,11 +33,12 @@ ActionBar.TabListener{
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
+	private PrintWriter out;
 	private ActionBar actionBar;
 	private TabsPagerAdapter mAdapter;
 	private ViewPager viewPager;
 	private String[] tabs = { "Main", "States" };
-
+		LockControl b;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,7 +56,13 @@ ActionBar.TabListener{
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	
-
+		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+		Log.d("SwipActivity.onCreate()","Twój adres urzadzenia: "+ba.getAddress());
+		
+		if(!ba.isEnabled()){
+			Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(i, 1);
+		}
 		// Adding Tabs
 		for (String tab_name : tabs) {
 			actionBar.addTab(actionBar.newTab().setText(tab_name)
@@ -82,9 +99,12 @@ ActionBar.TabListener{
 
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
-
-	
-
+	public void polacz(View view)
+	{
+		b=new LockControl();
+		b.openCar();
+		b.closeCar();
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -102,6 +122,12 @@ ActionBar.TabListener{
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	protected void onActivityResult(int requestCode,int resultCode,Intent i){
+		if(resultCode==Activity.RESULT_OK){
+			Log.d("SwipActivity.onresult","Mamy zgodê!");
+			BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();					
+		}
 	}
 
 }
