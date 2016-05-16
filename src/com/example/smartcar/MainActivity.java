@@ -15,6 +15,7 @@ public class MainActivity extends Activity {
 		////////
 		Intent activity= new Intent(this,SwipActivity.class);
 		startActivity(activity); 
+		finish();
 	}
 
 	@Override

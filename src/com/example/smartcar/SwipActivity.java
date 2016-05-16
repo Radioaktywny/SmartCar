@@ -114,24 +114,25 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 			Thread t = new Thread((new Runnable() {
 				@Override
 				public void run() {
-					// while (true)
+				 //while (true)
 					try {
 						if (!b.isConnected()) {
 							b.connect();
 							BluetoothControl.connected = true;
 							Log.d("INFO", "polacz() : polaczyl sie ");
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									bt.setChecked(true);
+								}
+							});
 						}
-						// break;
+						//break;
 					} catch (IOException es) {
 						BluetoothControl.connected = false;
 						es.printStackTrace();
 						showToast("nie udalo sie po³¹czyæ z samochodem");
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								bt.setChecked(false);
-							}
-						});
+						
 					}
 				}
 				// TODO Auto-generated method stub
@@ -141,6 +142,12 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 			try {
 				Log.d("INFO", "polacz() : ROZLACZYLEM");
 				b.disconnect();
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						bt.setChecked(false);
+					}
+				});
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -162,6 +169,8 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 
 	public void openClose(View view) {
+		if(b!=null)
+		{
 		final ToggleButton bt = (ToggleButton) findViewById(R.id.openClose);
 		bt.setChecked(!bt.isChecked());
 		if (b.isConnected()) {
@@ -180,9 +189,8 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 								}
 							});
 						} catch (IOException e) {
-							showToast(
-									"nast¹pi³ b³¹d przy otwieraniu drzwi, sprawdŸ swoje po³¹czenie z samochodem i spróbuj ponownie.");
-							e.printStackTrace();
+							showToast("Nie uda³o siê otworzyæ drzwi sprawdŸ po³¹czenie z samochodem.");
+							
 						}
 
 					}
@@ -202,15 +210,18 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 								}
 							});
 						} catch (IOException e) {
-							showToast(
-									"nast¹pi³ b³¹d przy otwieraniu drzwi, sprawdŸ swoje po³¹czenie z samochodem i spróbuj ponownie.");
-							e.printStackTrace();
+							showToast("Nie uda³o siê zamkn¹æ drzwi sprawdŸ po³¹czenie z samochodem.");
+							
 						}
 
 					}
 				}).start();
 			}
 		} else {
+			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
+		}
+		}else
+		{
 			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
 		}
 

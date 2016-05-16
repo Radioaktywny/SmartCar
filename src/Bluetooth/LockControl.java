@@ -13,17 +13,19 @@ public class LockControl extends BluetoothControl{
 		if(isConnected())
 		{
 			out.println("OPEN");
-			if(!bReader.readLine().equals("OPENED"));
-			throw new IOException("ERROR");
+//			if(bReader.ready())
+//			if(!bReader.readLine().contains("OPENED"));
+//			throw new IOException("ERROR");
 		}
 	}
 	public void closeCar() throws IOException
 	{
 		if(isConnected())
 		{
-			out.println("CLOSE");			
-			if(!bReader.readLine().equals("CLOSED"));
-			throw new IOException("ERROR");
+			out.println("CLOSE");
+//			if(bReader.ready())
+//			if(!bReader.readLine().contains("CLOSED"));
+//			throw new IOException("ERROR");
 		}
 	}
 	public void autoLocking(boolean state) throws IOException
@@ -34,8 +36,9 @@ public class LockControl extends BluetoothControl{
 			out.println("LOCKING_TRUE");			
 			else
 			out.println("LOCKING_FALSE");
-			if(!bReader.readLine().equals("LOCKING_ACCEPT"));
-			throw new IOException("ERROR");
+//			if(bReader.ready())
+//			if(!bReader.readLine().equals("LOCKING_ACCEPT"));
+//			throw new IOException("ERROR");
 		}
 	}
 	public void childSafetyLock()
