@@ -2,37 +2,53 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="189dp"
-        android:text="Połącz"
-        android:onClick="polacz" />
-
-    <TextView
-        android:id="@+id/textView1"
+    <ToggleButton
+        android:id="@+id/connectBT"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="76dp"
-        android:text="Kliknij aby połączyć !"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_marginTop="38dp"
+        android:gravity="left|center_vertical|center_horizontal"
+        android:onClick="polacz"
+        android:text="ToggleButton"
+        android:textOff="@string/connectToPi"
+        android:textOn="@string/connectToPi" />
 
-    <CheckBox
-        android:id="@+id/autoLogging"
+    <ToggleButton
+        android:id="@+id/openClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical|center_horizontal|left"
+        android:onClick="openClose"
+        android:text="@string/openClose"
+        android:textOff="@string/openDoor"
+        android:textOn="@string/closeDoor" />
+
+    <TextView
+        android:id="@+id/doorStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/connectBT"
+        android:layout_centerVertical="true"
+        android:text="@string/statusDrzwi"
+        android:textSize="18sp" />
+
+    <ToggleButton
+        android:id="@+id/autoLocking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/openClose"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="31dp"
-        android:text="Autołączenie"
-        android:onClick="autologging" />
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical"
+        android:onClick="autolocking"
+        android:text="@string/openClose"
+        android:textOff="@string/autoLocking"
+        android:textOn="@string/autoLocking" />
 
 </RelativeLayout>

@@ -1,6 +1,8 @@
 package Bluetooth;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.UUID;
@@ -10,10 +12,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 public class BluetoothControl {
-	protected static String MAC="B8:27:EB:8D:1A:37";
+	protected static String MAC="B8:27:EB:BF:C1:B0";
 	private BluetoothSocket mmSocket;
 	private final BluetoothDevice mmDevice;
 	protected PrintWriter out;
+	protected BufferedReader bReader;
 	public static boolean connected;
 	public BluetoothControl(String MAC) 
 	{
@@ -44,6 +47,7 @@ public class BluetoothControl {
         mmSocket.connect();
         connected=true;
         out=new PrintWriter(mmSocket.getOutputStream(),true);
+        bReader=new BufferedReader(new InputStreamReader(mmSocket.getInputStream()));
         return mmSocket;		
 	}
 	public void disconnect() throws IOException

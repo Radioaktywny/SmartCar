@@ -2,6 +2,7 @@ package com.example.smartcar;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import Bluetooth.BluetoothControl;
 import Bluetooth.LockControl;
@@ -15,10 +16,14 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class SwipActivity extends FragmentActivity implements ActionBar.TabListener {
 
@@ -100,71 +105,156 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 
 	public void polacz(View view) {
+		final ToggleButton bt = (ToggleButton) findViewById(R.id.connectBT);
+		bt.setChecked(!bt.isChecked());
 		if (b == null)
 			b = new LockControl();
-		Thread t = new Thread((new Runnable() {
 
-			@Override
-			public void run() {
-				while (true)
+		if (!bt.isChecked()) {
+			Thread t = new Thread((new Runnable() {
+				@Override
+				public void run() {
+					// while (true)
 					try {
 						if (!b.isConnected()) {
 							b.connect();
 							BluetoothControl.connected = true;
+							Log.d("INFO", "polacz() : polaczyl sie ");
 						}
-						break;
+						// break;
 					} catch (IOException es) {
 						BluetoothControl.connected = false;
 						es.printStackTrace();
+						showToast("nie udalo sie po³¹czyæ z samochodem");
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								bt.setChecked(false);
+							}
+						});
 					}
-			}
-			// TODO Auto-generated method stub
-		}));
-		t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (t.getState() == Thread.State.TERMINATED) {
-			b.openCar();
-			Log.d("POLACZYLEM", "WYSLALEM");
-			b.closeCar();
-		} else {
-			Log.d("Unable to connect", "ERROR");
-		}
-	}
-
-	public void autologging(View view) {
-		if (b == null)
-			b = new LockControl();
-		Thread t = new Thread(new Runnable() {
-			public volatile boolean run=true;
-			@Override
-			public void run() {
-				while (true)
-					try {
-						if (!b.isConnected()) {
-							b.connect();
-							BluetoothControl.connected = true;
-						}
-						break;
-					} catch (IOException es) {
-						BluetoothControl.connected = false;
-						es.printStackTrace();
-					}
+				}
 				// TODO Auto-generated method stub
-
-			}
-		});
-		;
-		CheckBox chk = (CheckBox) findViewById(R.id.autoLogging);
-		if (chk.isChecked()) {
+			}));
 			t.start();
 		} else {
-			//interuppt czy cos w tym stylu tutaj musi byc
+			try {
+				Log.d("INFO", "polacz() : ROZLACZYLEM");
+				b.disconnect();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
+	}
+
+	private void showToast(final String informacja) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				android.widget.Toast info = android.widget.Toast.makeText(SwipActivity.this, informacja,
+						Toast.LENGTH_SHORT);
+				info.setGravity(Gravity.CENTER, 0, 0);
+				info.show();
+			}
+		});
+	}
+
+	public void openClose(View view) {
+		final ToggleButton bt = (ToggleButton) findViewById(R.id.openClose);
+		bt.setChecked(!bt.isChecked());
+		if (b.isConnected()) {
+			final TextView tv = (TextView) findViewById(R.id.doorStatus);
+			if (!bt.isSelected()) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							b.openCar();
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									bt.setChecked(true);
+									tv.setText("Drzwi otwarte");
+								}
+							});
+						} catch (IOException e) {
+							showToast(
+									"nast¹pi³ b³¹d przy otwieraniu drzwi, sprawdŸ swoje po³¹czenie z samochodem i spróbuj ponownie.");
+							e.printStackTrace();
+						}
+
+					}
+				}).start();
+
+			} else {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							b.closeCar();
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									bt.setChecked(false);
+									tv.setText("Drzwi zamkniête");
+								}
+							});
+						} catch (IOException e) {
+							showToast(
+									"nast¹pi³ b³¹d przy otwieraniu drzwi, sprawdŸ swoje po³¹czenie z samochodem i spróbuj ponownie.");
+							e.printStackTrace();
+						}
+
+					}
+				}).start();
+			}
+		} else {
+			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
+		}
+
+	}
+
+	public void autolocking(View view) {
+		final ToggleButton bt = (ToggleButton) findViewById(R.id.autoLocking);
+		bt.setChecked(!bt.isChecked());
+		if (b == null)
+			b = new LockControl();
+		if (b.isConnected()) {
+			if (!bt.isChecked()) {
+					try {
+						b.autoLocking(true);
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								bt.setChecked(true);								
+							}
+						});
+					} catch (IOException e) {
+						// TODO Auto-generated catch block						
+						e.printStackTrace();
+						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
+					}
+			} else {
+					try {
+						b.autoLocking(false);						
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								bt.setChecked(false);
+							}
+						});
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
+					}
+			}
+		} else {
+			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
+		}
+
 	}
 
 	@Override
