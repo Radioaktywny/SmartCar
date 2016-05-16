@@ -9,14 +9,14 @@ public class LockControl extends BluetoothControl{
 	{
 		if(isConnected())
 		{
-			out.println("OPEN");
+			out.println("Otworz");
 		}
 	}
 	public void closeCar()
 	{
 		if(isConnected())
 		{
-			out.println("CLOSE");
+			out.println("Zamknij");
 		}
 	}
 	public void autoLocking()

@@ -18,9 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 
-public class SwipActivity extends FragmentActivity implements
-ActionBar.TabListener{
+public class SwipActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -29,7 +29,7 @@ ActionBar.TabListener{
 	 * becomes too memory intensive, it may be best to switch to a
 	 * {@link android.support.v13.app.FragmentStatePagerAdapter}.
 	 */
-	
+
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -38,7 +38,8 @@ ActionBar.TabListener{
 	private TabsPagerAdapter mAdapter;
 	private ViewPager viewPager;
 	private String[] tabs = { "Main", "States" };
-		LockControl b;
+	LockControl b;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,7 +47,6 @@ ActionBar.TabListener{
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
-		
 
 		// Set up the ViewPager with the sections adapter.
 		viewPager = (ViewPager) findViewById(R.id.pager);
@@ -55,23 +55,22 @@ ActionBar.TabListener{
 
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
-		Log.d("SwipActivity.onCreate()","Twój adres urzadzenia: "+ba.getAddress());
-		
-		if(!ba.isEnabled()){
-			Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		Log.d("SwipActivity.onCreate()", "Twój adres urzadzenia: " + ba.getAddress());
+
+		if (!ba.isEnabled()) {
+			Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(i, 1);
 		}
 		// Adding Tabs
 		for (String tab_name : tabs) {
-			actionBar.addTab(actionBar.newTab().setText(tab_name)
-					.setTabListener(this));
+			actionBar.addTab(actionBar.newTab().setText(tab_name).setTabListener(this));
 		}
 
 		/**
 		 * on swiping the viewpager make respective tab selected
-		 * */
+		 */
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
 			public void onPageSelected(int position) {
@@ -99,12 +98,75 @@ ActionBar.TabListener{
 
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
-	public void polacz(View view)
-	{
-		b=new LockControl();
-		b.openCar();
-		b.closeCar();
+
+	public void polacz(View view) {
+		if (b == null)
+			b = new LockControl();
+		Thread t = new Thread((new Runnable() {
+
+			@Override
+			public void run() {
+				while (true)
+					try {
+						if (!b.isConnected()) {
+							b.connect();
+							BluetoothControl.connected = true;
+						}
+						break;
+					} catch (IOException es) {
+						BluetoothControl.connected = false;
+						es.printStackTrace();
+					}
+			}
+			// TODO Auto-generated method stub
+		}));
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (t.getState() == Thread.State.TERMINATED) {
+			b.openCar();
+			Log.d("POLACZYLEM", "WYSLALEM");
+			b.closeCar();
+		} else {
+			Log.d("Unable to connect", "ERROR");
+		}
 	}
+
+	public void autologging(View view) {
+		if (b == null)
+			b = new LockControl();
+		Thread t = new Thread(new Runnable() {
+			public volatile boolean run=true;
+			@Override
+			public void run() {
+				while (true)
+					try {
+						if (!b.isConnected()) {
+							b.connect();
+							BluetoothControl.connected = true;
+						}
+						break;
+					} catch (IOException es) {
+						BluetoothControl.connected = false;
+						es.printStackTrace();
+					}
+				// TODO Auto-generated method stub
+
+			}
+		});
+		;
+		CheckBox chk = (CheckBox) findViewById(R.id.autoLogging);
+		if (chk.isChecked()) {
+			t.start();
+		} else {
+			//interuppt czy cos w tym stylu tutaj musi byc
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -123,10 +185,11 @@ ActionBar.TabListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	protected void onActivityResult(int requestCode,int resultCode,Intent i){
-		if(resultCode==Activity.RESULT_OK){
-			Log.d("SwipActivity.onresult","Mamy zgodê!");
-			BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();					
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent i) {
+		if (resultCode == Activity.RESULT_OK) {
+			Log.d("SwipActivity.onresult", "Mamy zgodê!");
+			BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
 		}
 	}
 

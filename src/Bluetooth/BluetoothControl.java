@@ -10,20 +10,22 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 public class BluetoothControl {
-	protected static String MAC="B8:27:EB:BF:C1:B0";
+	protected static String MAC="B8:27:EB:8D:1A:37";
 	private BluetoothSocket mmSocket;
 	private final BluetoothDevice mmDevice;
 	protected PrintWriter out;
-	private boolean connected;
+	public static boolean connected;
 	public BluetoothControl(String MAC) 
 	{
-		this.MAC=MAC;
+		//this.MAC=MAC;
 		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();	
 		mmDevice = ba.getRemoteDevice(MAC);  		
 			
 		    BluetoothSocket tmp = null;
 	        try {            
-	        	UUID uuid = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+	        	String uid = "00001101-0000-1000-8000-00805F9B34FB";
+
+	        	UUID uuid = UUID.fromString(uid);
 	            tmp = mmDevice.createRfcommSocketToServiceRecord(uuid);
 	        } catch (Exception e) {e.printStackTrace(); }
 	        mmSocket = tmp;
@@ -47,5 +49,6 @@ public class BluetoothControl {
 	public void disconnect() throws IOException
 	{
 		mmSocket.close();
+		connected=false;
 	}
 }
