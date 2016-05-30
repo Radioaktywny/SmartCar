@@ -17,5 +17,6 @@
     <string name="on">WŁ</string>
     <string name="off">OFF</string>
     <string name="connectToPi">Połączenie z samochodem</string>
+    <string name="wezLok">Wez lokalizacje</string>
 
 </resources>

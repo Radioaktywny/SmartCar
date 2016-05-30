@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
+import com.example.smartcar.LocationService.MyLocationListener;
+import com.google.android.gms.maps.GoogleMap;
+
 import Bluetooth.BluetoothControl;
 import Bluetooth.LockControl;
 import android.app.ActionBar;
@@ -12,6 +15,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -38,11 +42,11 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
-	private PrintWriter out;
 	private ActionBar actionBar;
 	private TabsPagerAdapter mAdapter;
 	private ViewPager viewPager;
 	private String[] tabs = { "Main", "States" };
+	GPSLocation gps;
 	LockControl b;
 
 	@Override
@@ -169,23 +173,25 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 
 	public void openClose(View view) {
+		final ToggleButton bt = (ToggleButton) findViewById(R.id.openClose);
 		if(b!=null)
 		{
-		final ToggleButton bt = (ToggleButton) findViewById(R.id.openClose);
 		bt.setChecked(!bt.isChecked());
+		//final TextView tv = (TextView) findViewById(R.id.doorStatus);
 		if (b.isConnected()) {
-			final TextView tv = (TextView) findViewById(R.id.doorStatus);
-			if (!bt.isSelected()) {
+			if (!bt.isChecked()) {
 				new Thread(new Runnable() {
-					@Override
+					@Override					
 					public void run() {
 						try {
 							b.openCar();
+
+							showToast("otwarto drzwi");
 							runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
 									bt.setChecked(true);
-									tv.setText("Drzwi otwarte");
+					//				tv.setText("Drzwi otwarte");
 								}
 							});
 						} catch (IOException e) {
@@ -202,11 +208,12 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 					public void run() {
 						try {
 							b.closeCar();
+							showToast("zamkniêto drzwi");
 							runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
+								//	tv.setText("Drzwi zamkniête");
 									bt.setChecked(false);
-									tv.setText("Drzwi zamkniête");
 								}
 							});
 						} catch (IOException e) {
@@ -218,54 +225,73 @@ public class SwipActivity extends FragmentActivity implements ActionBar.TabListe
 				}).start();
 			}
 		} else {
+			bt.setChecked(!bt.isChecked());
 			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
 		}
 		}else
 		{
+			bt.setChecked(!bt.isChecked());
 			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
 		}
 
 	}
-
+	public void wezLokalizacje(View view)
+	{
+		gps = new GPSLocation(SwipActivity.this);
+		gps.getLocation();
+		showToast(String.valueOf(gps.getLatitude())+String.valueOf( gps.getLongitude()));
+	}
 	public void autolocking(View view) {
-		final ToggleButton bt = (ToggleButton) findViewById(R.id.autoLocking);
-		bt.setChecked(!bt.isChecked());
-		if (b == null)
-			b = new LockControl();
-		if (b.isConnected()) {
-			if (!bt.isChecked()) {
-					try {
-						b.autoLocking(true);
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								bt.setChecked(true);								
-							}
-						});
-					} catch (IOException e) {
-						// TODO Auto-generated catch block						
-						e.printStackTrace();
-						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
-					}
-			} else {
-					try {
-						b.autoLocking(false);						
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								bt.setChecked(false);
-							}
-						});
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
-					}
+//		final ToggleButton bt = (ToggleButton) findViewById(R.id.autoLocking);
+//		bt.setChecked(!bt.isChecked());
+//		if (b == null)
+//			b = new LockControl();
+//		if (b.isConnected()) {
+//			if (!bt.isChecked()) {
+//					try {
+//						b.autoLocking(true);
+//						runOnUiThread(new Runnable() {
+//							@Override
+//							public void run() {
+//								bt.setChecked(true);								
+//							}
+//						});
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block						
+//						e.printStackTrace();
+//						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
+//					}
+//			} else {
+//					try {
+//						b.autoLocking(false);						
+//						runOnUiThread(new Runnable() {
+//							@Override
+//							public void run() {
+//								bt.setChecked(false);
+//							}
+//						});
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						showToast("Nie udalo siê zmieniæ autoblokowania zamków");
+//					}
+//			}
+//		} else {
+//			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
+//		}
+		LocationService l=new LocationService();
+		while(true)
+		{
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} else {
-			showToast("Najpierw po³¹cz siê z samochodem, by móc sterowaæ zamkami");
+			System.out.println(l.previousBestLocation.toString());
+			showToast(l.previousBestLocation.toString());
 		}
-
+		
 	}
 
 	@Override
